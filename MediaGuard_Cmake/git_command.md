@@ -47,3 +47,7 @@ SVN（Apache Subversion）和 Git 都是版本控制系統，但它們之間有�
    - SVN 的命令行界面相對簡單直觀。
 
 總的來說，Git 更適合大型項目和分布式團隊，提供更靈活、高效的分支和合併功能；而 SVN 在某些情況下可能更容易上手且穩定。選擇使用哪種版本控制系統取決於項目需求、團隊結構和開發流程。
+
+具體命令:
+
+git commit -m "Update deleteFile message tips" File.h
