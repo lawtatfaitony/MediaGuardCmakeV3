@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{82D4A4FB-767C-44BC-BF94-732199721950}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FfmpegHelper</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\boost_1_63_0;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>D:\boost_1_63_0\stage\64;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ENV_DEV)/ffmpeg/include;$(DEV_ENV)/ffmpeg/include;$(ENV_DEV)/opencv-4.0.0/include;$(DEV_ENV)/opencv-4.0.0/include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ENV_DEV)/ffmpeg/win32/lib;$(ENV_DEV)/opencv-4.0.0/win32/lib;$(DEV_ENV)/ffmpeg/win32/lib;$(DEV_ENV)/opencv-4.0.0/win32/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;postproc.lib;swresample.lib;opencv_core400d.lib;opencv_imgcodecs400d.lib;opencv_imgproc400d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;INITIALIZE_EASYLOGGINGPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\ffmpeg\include;$(ProjectDir)include\opencv-4.0.0/include;$(ProjectDir)include\common;$(ProjectDir)include\easylogging;$(ProjectDir)include\ErrorInfo;$(ProjectDir)include\Config</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)include\ffmpeg\win64\lib;$(ProjectDir)include\opencv-4.0.0/win64\lib;$(ProjectDir)lib\easylogging\win64\debug;$(ProjectDir)lib\libcurl\win64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;postproc.lib;swresample.lib;opencv_core400d.lib;opencv_imgcodecs400d.lib;opencv_imgproc400d.lib;easylogging.lib;libcurl_debug.lib;libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;INITIALIZE_EASYLOGGINGPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\ffmpeg\include;$(ProjectDir)include\opencv-4.0.0\include;$(ProjectDir)include\common;$(ProjectDir)include\easylogging\win64/release;$(ProjectDir)include\easylogging;$(ProjectDir)include\ErrorInfo;$(ProjectDir)include\Config</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)include\ffmpeg\win64\lib;$(ProjectDir)include\opencv-4.0.0/win64\lib;$(ProjectDir)lib\easylogging\win64\release;$(ProjectDir)lib\libcurl\win64\release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;postproc.lib;swresample.lib;opencv_core400.lib;opencv_imgcodecs400.lib;opencv_imgproc400.lib;easylogging.lib;libcurl.lib;libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioStreamHandle.cpp" />
+    <ClCompile Include="hmac\hmac_sha1.cpp" />
+    <ClCompile Include="hmac\main_hmac_test.cpp" />
+    <ClCompile Include="hmac\sha1.cpp" />
+    <ClCompile Include="include\Common\CvMatToBase64.cpp" />
+    <ClCompile Include="include\Common\CvMatToBase64.h" />
+    <ClCompile Include="include\Common\FileUtil.cpp" />
+    <ClCompile Include="include\Common\TransCoding.cpp" />
+    <ClCompile Include="include\Config\DeviceConfig.cpp" />
+    <ClCompile Include="include\Config\GlobalConfig.cpp" />
+    <ClCompile Include="include\easylogging\LoggingHelper.cpp" />
+    <ClCompile Include="include\ErrorInfo\ErrorMessage.cpp" />
+    <ClCompile Include="include\Http\LibcurlHelper.cpp" />
+    <ClCompile Include="interface\CameraMpeg.cpp" />
+    <ClCompile Include="interface\DeviceInfo.cpp" />
+    <ClCompile Include="mainFFmpegSample.cpp" />
+    <ClCompile Include="mainTest.cpp" />
+    <ClCompile Include="ManagerController.cpp" />
+    <ClCompile Include="RtspStreamHandle.cpp" />
+    <ClCompile Include="StreamManager.cpp" />
+    <ClCompile Include="UsbStreamHandle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AudioStreamHandle.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="hmac\hmac_sha1.h" />
+    <ClInclude Include="hmac\sha1.h" />
+    <ClInclude Include="include\Common\CrossPlat.h" />
+    <ClInclude Include="include\Common\FileUtil.h" />
+    <ClInclude Include="include\Common\JsonHelper.h" />
+    <ClInclude Include="include\Common\Macro.h" />
+    <ClInclude Include="include\Common\TransCoding.h" />
+    <ClInclude Include="include\Config\ConfigFile.h" />
+    <ClInclude Include="include\Config\DeviceConfig.h" />
+    <ClInclude Include="include\Config\GlobalConfig.h" />
+    <ClInclude Include="include\easylogging\LoggingHelper.h" />
+    <ClInclude Include="include\ErrorInfo\ErrorCode.h" />
+    <ClInclude Include="include\ErrorInfo\ErrorMessage.h" />
+    <ClInclude Include="include\Http\LibcurlHelper.h" />
+    <ClInclude Include="interface\CameraMpeg.h" />
+    <ClInclude Include="interface\DeviceInfo.h" />
+    <ClInclude Include="ManagerController.h" />
+    <ClInclude Include="StreamDefine.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="RtspStreamHandle.h" />
+    <ClInclude Include="StreamManager.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Time.h" />
+    <ClInclude Include="UsbStreamHandle.h" />
+    <ClInclude Include="StreamHandle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="conf\config.json" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="config.xml" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

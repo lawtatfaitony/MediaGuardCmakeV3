@@ -1,0 +1,26 @@
+设置共享库: 如 libswresample.so.4
+$ ./MediaGuard
+./MediaGuard: error while loading shared libraries: libswresample.so.4:
+ cannot open shared object file: No such file or directory文件  libswresample.so.4 明確存在,但是老是提示上述錯誤
+
+這個錯誤通常表示執行檔 MediaGuard 需要使用到 libswresample.so.4 這個共享庫，但系統找不到該共享庫。為了解決這個問題，你可以嘗試以下方法：
+
+1. **更新共享庫快取**：
+   在終端機中執行以下指令更新共享庫快取：
+   ```
+   sudo ldconfig
+   ```
+
+2. **設置共享庫路徑**： /home/tonylaw/Desktop/MediaGuard_Cmake/output
+   如果 libswresample.so.4 位於非標準路徑下，你可以透過以下方式告訴系統共享庫的位置：
+   ```
+   export LD_LIBRARY_PATH=/home/tonylaw/Desktop/MediaGuard_Cmake/output:$LD_LIBRARY_PATH
+   ```
+
+3. **建立共享庫符號連結**：
+   你也可以嘗試在系統中建立共享庫的符號連結，讓系統能夠找到它：
+   ```
+   sudo ln -s /home/tonylaw/Desktop/MediaGuard_Cmake/output:/libswresample.so.4 /usr/lib/libswresample.so.4
+   ```
+
+請確保替換命令中的 `/path/to/` 部分為 libswresample.so.4 實際所在的路徑。這些方法中的一個應該可以幫助系統找到 libswresample.so.4 共享庫，從而解決錯誤。希望這可以協助你解決問題！
