@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <filesystem>  // C++ std 17 
 #include <chrono>
@@ -9,92 +10,14 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#ifdef _WIN32
-
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
-
-#define ST_access(file,mode) _access(file,mode)
-#define ST_local_time(time,tm) localtime_s(&tm, &time)
-#define ST_mkdir(dir) _mkdir(dir)
-#define ST_remove(file) remove(file)
- 
-
-#else
-
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#define ST_access(file,mode) access(file,mode)
-#define ST_local_time(time,tm) localtime_r(&time, &tm)
-#define ST_mkdir(dir) mkdir(dir, 775)
-#define ST_remove(file) rm(file)
-  
-#endif
-
 static const char kWindowSplash = '\\';
 static const char kLinuxSplash = '/';
 #ifdef _WIN32
 static const char kSeprator = kWindowSplash;
-#else
+#elif __linux__
 static const char kSeprator = kLinuxSplash;
-#endif  
+#endif
 
-// #pragma once
-//#include <string>
-//#include <iostream>
-//#include <vector>
-//#include <iostream>
-//#include <filesystem>  // C++ std 17 
-//#include <chrono>
-//
-//#include <rapidjson/document.h>
-//#include <rapidjson/filereadstream.h> 
-//#include "rapidjson/stringbuffer.h"
-//#include "rapidjson/writer.h"
-//
-//
-//
-//#ifdef _WIN32
-//
-//#include <windows.h>
-//#include <direct.h>
-//#include <io.h>
-//
-//#define ST_access(file,mode) _access(file,mode)
-//#define ST_local_time(time,tm) localtime_s(&tm, &time)
-//#define ST_mkdir(dir) _mkdir(dir)
-//#define ST_remove(file) remove(file)
-//
-//#else
-//
-//#pragma once
-//#include <unistd.h>
-//#include <dirent.h>
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//
-//#define ST_access(file,mode) access(file,mode)
-//#define ST_local_time(time,tm) localtime_r(&time, &tm)
-//#define ST_mkdir(dir) mkdir(dir, 775)
-//#define ST_remove(file) rm(file)
-//
-//
-//#endif
-//
-//
-//static const char kWindowSplash = '\\';
-//static const char kLinuxSplash = '/';
-//#ifdef _WIN32
-//static const char kSeprator = kWindowSplash;
-//#else
-//static const char kSeprator = kLinuxSplash;
-//#endif // _WIN32
-
-//=====================================================================
 namespace fs = std::filesystem;
 
 class File
@@ -102,30 +25,13 @@ class File
 	static const int kSuccess = 0;
 	static const int kError = -1;
 public:
-	 
+
 	/*獲取 應用程式根路徑*/
 	static std::string GetWorkPath()
 	{
-#ifdef _WIN32 
-		///current_working_directory
-		char buff_workpath[255];
-		_getcwd(buff_workpath, sizeof(buff_workpath));
-		static std::string current_working_directory(buff_workpath);
-		static std::string workpath = current_working_directory;
-		return workpath;
-#else 
-		///current_working_directory  
-		char buff_workpath[255];
-		if (getcwd(buff_workpath, sizeof(buff_workpath)) != NULL) {
-			std::cout << "File.h linux getcwd: " << buff_workpath << std::endl;
-		}
-		else {
-			perror("File.h linux getcwd error");
-		}
-		static std::string current_working_directory(buff_workpath);
-		static std::string workpath = current_working_directory;
-		return workpath;
-#endif //__linux__
+		const fs::path rootPath = fs::current_path();
+		//std::cout << "APPCLICATION ROOT PATH (from File::GetWorkPath) : " << rootPath << std::endl;
+		return rootPath.string();
 	}
 
 	/*
@@ -150,14 +56,16 @@ public:
 	*/
 	static bool CreateSingleDirectory(const std::string& strDir)
 	{
-		if (-1 == ST_access(strDir.c_str(), 0))
-		{
-			if (kSuccess == ST_mkdir(strDir.c_str()))
-				return true;
-			printf("Create directory:%s failed:", strDir.c_str());
+		try {
+			// 使用 std::filesystem 創建目錄
+			fs::create_directory(strDir);
+			std::cout << "\nCreated Directory Successfully: " << strDir << "\n" << std::endl;
+			return true;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "\nCreated Directory error (File::CreateSingleDirectory): " << e.what() << "\n" << std::endl;
 			return false;
 		}
-		return true;
 	}
 
 	/*
@@ -169,31 +77,31 @@ public:
 	*/
 	static bool CreateMultiDirectory(const std::string& strDir)
 	{
-		std::string strTmpPath(strDir);
-		if (!CheckEndWithSplash(strTmpPath))
-			strTmpPath += kSeprator;
+		if (isDirectoryExists(strDir))
+			return true;
 
-		size_t nPrePos = 0;
-		size_t nCurrPos = 0;
-		while (nCurrPos = strTmpPath.find_first_of(kSeprator, nCurrPos), nCurrPos != -1)
-		{
-			std::string strTmpDir = strTmpPath.substr(0, ++nCurrPos);
-			if (kSuccess != ST_access(strTmpDir.c_str(), 0))
-			{
-				if (kSuccess != ST_mkdir(strTmpDir.c_str()))
-				{
-					printf("Create directory:%s failed:", strDir.c_str());
-					return false;
-				}
-			}
-			nPrePos = nCurrPos;
+		try {
+			// 使用 std::filesystem 創建多層目錄
+			fs::create_directories(strDir);
+			std::cout << "\nCreated directories successfully: " << strDir << "\n" << std::endl;
+			return true;
 		}
-		return true;
+		catch (const std::exception& e) {
+			std::cerr << "\nCreated directories error: " << e.what() << "\n" << std::endl;
+			return false;
+		}
 	}
 
 	/*
 	* get_file_info win/linux
-	*/  
+	* 获取文件的创建时间
+	* https://www.cnblogs.com/longma8586/p/13849223.html
+	* c++ 获取文件创建时间、修改时间、访问时间、文件内容长度
+	* 然后转换为本地时间
+	* 转换: FileTime --> LocalTime
+	* FileTimeToSystemTime(&ftCreate, &stUTC1);
+	* SystemTimeToTzSpecificLocalTime(NULL, &stUTC1, &stLocal1);
+	*/
 	static bool get_file_info(const std::string& strFilePath, int& iCreateTime, int& iModifyTime, int& iAccessTime, int& iFileLen) {
 		try {
 			fs::path filepath(strFilePath);
@@ -204,13 +112,13 @@ public:
 			}
 
 			auto fileStatus = fs::status(filepath);
-			 
-			iFileLen = static_cast<int>(fs::file_size(filepath)); 
-			auto lstTime = fs::last_write_time(filepath); 
-			iModifyTime = std::chrono::duration_cast<std::chrono::milliseconds>(lstTime.time_since_epoch()).count();    
+
+			iFileLen = static_cast<int>(fs::file_size(filepath));
+			auto lstTime = fs::last_write_time(filepath);
+			iModifyTime = std::chrono::duration_cast<std::chrono::milliseconds>(lstTime.time_since_epoch()).count();
 			iAccessTime = iModifyTime;  //先應付需求,後續解決
 			iCreateTime = iModifyTime;  //先應付需求,後續解決
-			 
+
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Error while getting file info: " << e.what() << std::endl;
@@ -222,7 +130,7 @@ public:
 	/*
 	* 刪除目錄 std::string directoryPath = "path/to/your/directory"; // 指定要刪除的目錄路徑
 	* removeDirectory(directoryPath);
-	*/ 
+	*/
 	static void removeDirectory(const std::string& path) {
 		try {
 			fs::path directoryPath(path);
@@ -259,19 +167,19 @@ public:
 		std::filesystem::path filepath(filePathx);
 
 		if (!std::filesystem::exists(filepath)) {
-			std::cerr << "File::deleteFile File Not Exist : " << filepath.c_str() << std::endl;
+			std::cerr << "\nFile::deleteFile File Not Exist : " << filepath.string() << "\n" << std::endl;
 			return false;
 		}
-		std::string strPath = filepath.string();
-		const char* cfilepath = strPath.c_str();
 
-		if (std::remove(cfilepath) != 0) {
-			std::cerr << "File::deleteFile Failed to delete file: " << filepath.c_str() << std::endl;
-			return false;
+		if (fs::remove(filepath) == true) {
+			//TEST 
+			std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
+
+			return true;
 		}
 		else {
-			std::cout << "File::deleteFile File deleted successfully: " << filepath.c_str() << std::endl;
-			return true;
+			std::cerr << "\nFile::deleteFile() = [false] to deleted file fail!!! : " << filepath.string() << "\n" << std::endl;
+			return false;
 		}
 	}
 
@@ -304,7 +212,12 @@ public:
 			}
 		}
 	}
-	 
+
+	/* 判斷目錄是否存在 */
+	static bool isDirectoryExists(const std::string& directoryPath) {
+		fs::path pathToCheck(directoryPath);
+		return fs::exists(pathToCheck) && fs::is_directory(pathToCheck);
+	}
 	/*
 	* support the json file reading
 	* 讀取配置文件 deviceconfig.json

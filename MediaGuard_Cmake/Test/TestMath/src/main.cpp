@@ -8,6 +8,10 @@
 
 //$(ProjectDir)include\ 其他包含目錄 加入這句
 #include "File.h"
+#include "Time.h"
+#include <thread>
+#include <mutex>
+#include "ManagerController.h"
 
 void TestHelloWorld()
 {
@@ -22,11 +26,9 @@ void TestMathLibrary()
 } 
 
  
- 
-
- 
 int main()
 {
+
 	TestHelloWorld();
 	TestMathLibrary();
 	std::cout << "Hello World\n";
@@ -34,8 +36,8 @@ int main()
 	std::cout << "Hello test  not use" << std::endl;
 	 
 	std::cout << "File::MorkPath"<< File::GetWorkPath() << std::endl;
-    
-	std::cout << "Get CPU ID : "<< File:: << std::endl;
+      
 
 	return 0;
 }
+
