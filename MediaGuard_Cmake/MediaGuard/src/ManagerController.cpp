@@ -59,6 +59,7 @@ ManagerController::~ManagerController()
 {
 }
 
+/* 每秒運行邏輯 是用於判斷 對時間比較敏感的目錄進行判斷*/
 void run()
 {   
 	 
@@ -67,7 +68,7 @@ void run()
 	 
 	while (!g_bExit.load())
 	{ 
-		if (bFirstRun)
+		if (bFirstRun)  
 		{ 
 			fs::path video_path = fs::current_path() / kVideoDir / Time::GetCurrentDate();
 			//fs::path audio_path = fs::current_path() / kAudioDir / Time::GetCurrentDate();
