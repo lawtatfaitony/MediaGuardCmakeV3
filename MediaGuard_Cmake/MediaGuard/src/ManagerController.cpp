@@ -333,7 +333,7 @@ void ManagerController::clean_picture(int64_t picRemainMinutes)
 {
 	const fs::path picture_path = fs::current_path().append("picture"); //ManagerController::current_working_directory();
 	//TEST  clean_picture
-	LOG(INFO) << "[TEST] [func::clean_picture] picture_path:" << picture_path << "\n";
+	//LOG(INFO) << "[TEST] [func::clean_picture] picture_path:" << picture_path << "\n";
 
 	//tu-tu said:
 	//c++17 跨平台 std::fs::current_path() 
@@ -369,7 +369,7 @@ void ManagerController::clean_picture(int64_t picRemainMinutes)
 					 fs::path picture_path_file(picutre_path_filename);
 					 File::deleteFile(picutre_path_filename);
   
-					 LOG(INFO) << "func::clean_picture DeleteFile:" << picture_path_file.string();
+					 //LOG(INFO) << "func::clean_picture DeleteFile:" << picture_path_file.string();
 					   
 				}
 				catch (...) {
@@ -610,26 +610,26 @@ void ManagerController::signal_check_main()
 			transform(input.begin(), input.end(), input.begin(), ::tolower);
 		}
 		else {
-			std::cout << "Input exit again to treminate!\n" << std::endl;
+			std::cout << "\nInput exit again to treminate!\n\n" << std::endl;
 		}
  
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 		if (std::cin.fail())
 		{
-			std::cout << "Input exit again to treminate!\n" << std::endl;
+			std::cout << "\nInput exit again to treminate!\n" << std::endl;
 			std::cin.clear();
 			std::cin.sync();
 		}
 		if (input == "exit")
 		{
-			LOG(INFO) << "now will be exit as you input = " << input << "\n";
+			LOG(INFO) << "\nnow will be exit as you input = " << input << "\n";
 			main_exit = true;
 			break;
 		}
 		else if (input != "") {
 
-			std::cout << "you input :(" << input << ") invalid,input exit to end.\n" << std::endl;
+			std::cout << "\nyou input :(" << input << ") invalid,input exit to end.\n" << std::endl;
 		}
 
 		getline(std::cin, input);
@@ -643,13 +643,14 @@ void ManagerController::signal_check_main()
 void ManagerController::main_initialize()
 {
 #ifdef _WIN32
-	SetConsoleTitle("Media Guard Ver2.2 ");
+	SetConsoleTitle("\nMedia Guard Ver3.0 ");
 #elif __linux__
-	std::cout << "\nMedia Guard Ver2.2 \n\n\n" << std::endl;
+	std::cout << "\nMedia Guard Ver3.0 \n\n\n" << std::endl;
   
 #endif
+
 	std::string main_root = current_working_directory();
-	std::cout << "\nCurrent working directory:" << main_root << "\n" << std::endl;
+	std::cout << "\n\tCurrent working directory:" << main_root << "\n" << std::endl;
 
 	ManagerController::create_main_media_folder();
 }
@@ -675,7 +676,7 @@ void ManagerController::create_main_media_folder()
 	fs::path hls_path = fs::current_path() / kHlsDir;
 
 	if (!File::isDirectoryExists(video_path.string()))
-		File::CreateSingleDirectory(picture_path.string());
+		File::CreateSingleDirectory(video_path.string());
 
 	if (!File::isDirectoryExists(picture_path.string()))
 		File::CreateSingleDirectory(picture_path.string());

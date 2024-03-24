@@ -107,7 +107,7 @@ public:
 			fs::path filepath(strFilePath);
 
 			if (!fs::exists(filepath)) {
-				std::cerr << "File::get_file_info File Not Exist : " << strFilePath << std::endl;
+				std::cerr << "\nFile::get_file_info File Not Exist : " << strFilePath << "\n" << std::endl;
 				return false;
 			}
 
@@ -121,7 +121,7 @@ public:
 			 
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Error while getting file info: " << e.what() << std::endl;
+			std::cerr << "\nError while getting file info: " << e.what() << "\n" << std::endl;
 			return false;
 		}
 
@@ -137,14 +137,14 @@ public:
 
 			if (fs::exists(directoryPath)) {
 				fs::remove_all(directoryPath);
-				std::cout << "File::removeDirectory Directory removed: " << path << std::endl;
+				std::cout << "\nFile::removeDirectory Directory removed: " << path << "\n" << std::endl;
 			}
 			else {
-				std::cerr << "File::removeDirectory Directory does not exist: " << path << std::endl;
+				std::cerr << "\nFile::removeDirectory Directory does not exist: " << path << "\n" << std::endl;
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << "File::removeDirectory Error while removing directory: " << e.what() << std::endl;
+			std::cerr << "\nFile::removeDirectory Error while removing directory: " << e.what() << "\n" << std::endl;
 		}
 	}
 
@@ -176,7 +176,8 @@ public:
 		  
 		if (fs::remove(filepath) == true) { 
 			//TEST 
-			std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
+			
+			//std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
 
 			return true;
 		}
@@ -199,7 +200,7 @@ public:
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Error while reading directory: " << e.what() << std::endl;
+			std::cerr << "\nError while reading directory: " << e.what() << "\n" << std::endl;
 			return false;
 		}
 
@@ -232,7 +233,7 @@ public:
 		const char* filename = strFile.c_str();
 		FILE* fp = fopen(filename, "rb");
 		if (!fp) {
-			std::cerr << "CAN NOT OPEN JSON FILE : " << filename << std::endl;
+			std::cerr << "\nCAN NOT OPEN JSON FILE : " << filename << "\n" << std::endl;
 			return jsonString;
 		}
 
@@ -243,7 +244,7 @@ public:
 		document.ParseStream(is);
 
 		if (document.HasParseError()) {
-			std::cerr << "PARSE  JSON FILE  ERROR OCCURED!!!" << strFile << std::endl;
+			std::cerr << "\nPARSE  JSON FILE  ERROR OCCURED!!!" << strFile << "\n" << std::endl;
 			fclose(fp);
 			return jsonString;
 		}

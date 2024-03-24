@@ -18,8 +18,8 @@ namespace fs = std::filesystem;
 // return: 0(continue original call), other(interrupt original call)
 int RtspStreamHandle::read_interrupt_cb(void* pContext)
 {
-	av_log(NULL, AV_LOG_INFO, "func::read_interrupt_cb  \n");
-	LOG(INFO) << "[RtspStreamHandel::read_interrupt_cb]";
+	/*av_log(NULL, AV_LOG_INFO, "func::read_interrupt_cb  \n");
+	LOG(INFO) << "[RtspStreamHandel::read_interrupt_cb]";*/
 	return 0;
 }
 
@@ -34,6 +34,7 @@ enum AVPixelFormat RtspStreamHandle::get_hw_format(AVCodecContext* ctx, const en
 	fprintf(stderr, "Failed to get HW surface format.\n");
 	return AV_PIX_FMT_NONE;
 }
+
 
 int RtspStreamHandle::hw_decoder_init(AVCodecContext* ctx, const enum AVHWDeviceType type)
 {
@@ -202,10 +203,20 @@ bool RtspStreamHandle::open_input_stream()
 	m_pInputAVFormatCtx->flags |= AVFMT_FLAG_NONBLOCK;
 
 	av_dict_set(&pOption, "rtsp_transport", "tcp", 0);
+
+#ifdef _WIN32
 	av_dict_set(&pOption, "buffer_size", "409600", 0);
 	av_dict_set(&pOption, "probesize", "1048576", 0);	 //加大读取区的缓存
+#endif 
+
+#ifdef __linux__
+	av_dict_set(&pOption, "buffer_size", "204800", 0); // 降低 buffer_size 的大小為 200KB
+	av_dict_set(&pOption, "probesize", "524288", 0); // 降低 probesize 的大小為 512KB
+#endif 
+	 
 	av_dict_set(&pOption, "stimeout", "2000000", 0);	 //如果没有设置stimeout，那么把ipc网线拔掉，av_read_frame会阻塞（时间单位是微妙）		
 	av_dict_set(&pOption, "fflags", "nobuffer", 0);		 //无缓存，解码时有效 https://blog.csdn.net/asdasfdgdhh/article/details/125501488
+	
 	m_pInputAVFormatCtx->interrupt_callback = { read_interrupt_cb, this };
 
 	int nCode = avformat_open_input(&m_pInputAVFormatCtx, m_infoStream.strInput.c_str(), nullptr, &pOption);
@@ -293,6 +304,7 @@ bool RtspStreamHandle::open_codec_context(int& nStreamIndex, AVCodecContext** pD
 						pDecoder->name, av_hwdevice_get_type_name((AVHWDeviceType)m_infoStream.nHDType)); 
 					  //打印解码器类型
 					av_log(NULL, AV_LOG_INFO, "Decoder %s does support device type %s.\n", pDecoder->name, av_hwdevice_get_type_name((AVHWDeviceType)m_infoStream.nHDType));
+				    LOG(INFO) << "\nDecoder " << pDecoder->name << " does support device type" << "av_hwdevice_get_type_name = "<< av_hwdevice_get_type_name((AVHWDeviceType)m_infoStream.nHDType)<<"\n";
 					return false;
 				}
 				if (pConfig->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
@@ -413,16 +425,16 @@ bool RtspStreamHandle::open_output_stream(AVFormatContext*& pFormatCtx, bool bRt
 		printf("Can't alloc output context (RtspStreamHandle::open_output_stream::avformat_alloc_output_context2) \n");
 		return false;
 	}
-	// codec = AAC
-#ifdef _WIN32
-	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-#elif __linux__
-	// 编码导致的?
-	//pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-	//pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-#endif
-
+	 
+//#ifdef _WIN32
+//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
+//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
+//#elif __linux__
+//	// 编码导致的?
+//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;  
+//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
+//#endif
+	 
 	for (auto nIndex = 0; nIndex < m_pInputAVFormatCtx->nb_streams; ++nIndex)
 	{
 		AVStream* pInStream = m_pInputAVFormatCtx->streams[nIndex];
@@ -502,13 +514,18 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 
 	//解決路徑不對問題,改為 格式: ./hls/8/index.m3u8 相對exe文件的路徑 2024-3-18
 	//std::string hls_output_path = "./hls/"+ to_string(m_infoStream.nCameraId)+ "/index.m3u8";
-	std::string strOutputPath = get_filename(FType::kFileTypeHls); 
-	LOG(WARNING) << "[HLS] RtspStramHandle::avformat_alloc_output_context2:" << strOutputPath;
+
+	std::string strOutputPath = get_filename(FType::kFileTypeHls);  
 	int nCode = avformat_alloc_output_context2(&pFormatCtx, NULL, strFormatName.c_str(), strOutputPath.c_str());
+
+  	//---------------------------------------------------------------
+	//std::string strOutputPath = "./hls/"+ to_string(m_infoStream.nCameraId)+ "/index.m3u8";
+	//int nCode = avformat_alloc_output_context2(&pFormatCtx, nullptr, "hls", strOutputPath.c_str());
 
 	if (nullptr == pFormatCtx)
 	{
-		printf("Can't alloc output context \n");
+		LOG(WARNING) << "[hls] RtspStramHandle::avformat_alloc_output_context2:" << strOutputPath;
+		printf("Can't alloc hls output context %s\n", strOutputPath.c_str());
 		return false;
 	}
 
@@ -635,7 +652,7 @@ void RtspStreamHandle::clean_hls_ts_run()
 		return;
 	}
 	while (!m_bExit.load())
-	{
+	{ 
 		clean_hls_ts(30); //保留20秒的文件记录 注意设置hls av_dist的时候不能大于这个时间，
 		SHARED_LOCK(m_mtLock);
 		m_cvCond.wait_for(locker, std::chrono::milliseconds(60000), [this]() {  //60's
@@ -667,7 +684,7 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 			std::chrono::system_clock::time_point before_minutes_time = curr - std::chrono::seconds(tsRemainSeconds);
 			auto longremaintime = std::chrono::duration_cast<std::chrono::seconds>(before_minutes_time.time_since_epoch());
 			int64_t longCreateTime = static_cast<int64_t>(iCreateTime);
-			if (longCreateTime < longremaintime.count() && fs::exists(ts_path_filename))
+			if (longCreateTime < longremaintime.count())
 			{ 
 				try {
 
@@ -682,9 +699,9 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 
 			}
 			//for TEST
-			/*else {
+			else {
 				LOG(INFO) << Time::GetCurrentSystemTime() << "[file not in " << tsRemainSeconds << " seconds ago]" << " file create:" << longCreateTime << "-" << iCreateTime << " | " << longremaintime.count();
-			}*/
+			}
 		}
 	}
 	vecFile.clear();
