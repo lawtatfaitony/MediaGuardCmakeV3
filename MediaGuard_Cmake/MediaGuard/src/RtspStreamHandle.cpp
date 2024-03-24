@@ -711,31 +711,36 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 {
 	const fs::path hls_camera_path = fs::current_path() / kHlsDir / std::to_string(m_infoStream.nCameraId);
 	const fs::path hls_path__filename_index_m3u8 = hls_camera_path / "index.m3u8";
-	
+	 
 	std::vector<std::string> vecFile;
 	File::GetFilesOfDir(hls_camera_path.string(), vecFile);
 
 	for (size_t i = 0; i < vecFile.size(); i++) {
-		  
-		const std::string hls_path_filename_string = vecFile[i].c_str();
 		 
 		int iCreateTime, iModifyTime, iAccessTime, iFileLen;
 
-		if (TRUE == File::get_file_info(hls_path_filename_string, iCreateTime, iModifyTime, iAccessTime, iFileLen))
+		const std::string ts_path_filename = vecFile[i].c_str();
+
+		if (true == File::get_file_info(ts_path_filename, iCreateTime, iModifyTime, iAccessTime, iFileLen))
 		{
 			//获取多少分钟前的时间
 			std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
 			std::chrono::system_clock::time_point before_minutes_time = curr - std::chrono::seconds(tsRemainSeconds);
 			auto longremaintime = std::chrono::duration_cast<std::chrono::seconds>(before_minutes_time.time_since_epoch());
 			int64_t longCreateTime = static_cast<int64_t>(iCreateTime);
-			if (longCreateTime < longremaintime.count())
+			if (longCreateTime < longremaintime.count() && fs::exists(ts_path_filename))
 			{ 
 				try {
-					File::deleteFile(hls_path_filename_string);
+
+					File::deleteFile(ts_path_filename);
+				}
+				catch (const std::exception& ex) {
+					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: " << ex.what() << "\n" << ts_path_filename << std::endl;
 				}
 				catch (...) {
-					LOG(ERROR) << hls_path_filename_string << " [EXCEPTION] DELETED TS FILE FAIL" << std::endl;
+					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: Unknown exception" << std::endl;
 				}
+
 			}
 			//for TEST
 			/*else {
@@ -744,6 +749,7 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 		}
 	}
 }
+
 
 void RtspStreamHandle::close_output_stream()
 {
