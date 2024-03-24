@@ -690,6 +690,7 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 	vecFile.clear();
 }
 
+
 void RtspStreamHandle::close_output_stream()
 {
 	release_output_format_context(m_pOutputFileAVFormatCtx);
