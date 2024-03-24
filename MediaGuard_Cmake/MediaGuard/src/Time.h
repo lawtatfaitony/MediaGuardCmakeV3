@@ -19,11 +19,9 @@ public:
 #ifdef _WIN32
 		localtime_s(&ltm, &ltime);
 #elif __linux__
-		// 请自行百度使用localtime_r代替
-		//localtime_r();
+		localtime_r(&ltime, &ltm);
 #endif
-		char buffer[128] = { 0 };
-
+		char buffer[128] = { 0 }; 
 		strftime(buffer, sizeof(buffer), "%Y-%m-%d", &ltm);
 		return buffer;
 	}
@@ -35,13 +33,15 @@ public:
 #ifdef _WIN32
 		localtime_s(&ltm, &ltime);
 #elif __linux__
-		// 请自行百度使用localtime_r代替
-		//localtime_r();
+		struct tm result;
+		localtime_r(&ltime, &result);
+		ltm = result;
 #endif
 		char buffer[128] = { 0 };
 		strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &ltm);
 		return buffer;
 	}
+
 
 	static int64_t GetMilliTimestamp()
 	{

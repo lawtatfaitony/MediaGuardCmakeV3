@@ -1,0 +1,35 @@
+
+
+// 打开RTSP流
+while (1) {
+    // 尝试连接服务器
+    int err = avformat_open_input(&fmt_ctx, rtsp_url, NULL, &options);
+    if (err < 0) {
+        // 连接失败，等待一段时间后重新尝试连接
+        avformat_close_input(&fmt_ctx);
+        sleep(10);
+        continue;
+    }
+    // 获取媒体流信息
+    err = avformat_find_stream_info(fmt_ctx, NULL);
+    if (err < 0) {
+        // 媒体流信息获取失败，需要重试建立连接
+        avformat_close_input(&fmt_ctx);
+        sleep(10);
+        continue;
+    }
+    // 进入读取数据的循环中
+    while (1) {
+        AVPacket pkt;
+        int ret = av_read_frame(fmt_ctx, &pkt);
+        if (ret < 0) {
+            if (is_network_error(ret)) {   // 判断是否为网络异常
+                avformat_close_input(&fmt_ctx);  // 关闭当前连接
+                break;                           // 跳出读取循环并重新连接服务器
+            } else {
+                continue;                        // 继续读取下一个数据包
+            }
+        }
+        // 处理数据包...
+     }
+}

@@ -49,7 +49,7 @@ void StreamMangement::ListSupportedHD()
 	enum AVHWDeviceType nType = AV_HWDEVICE_TYPE_NONE;
 	while ((nType = av_hwdevice_iterate_types(nType)) != AV_HWDEVICE_TYPE_NONE)
 		ss << av_hwdevice_get_type_name(nType) << ",";
-	printf("Supported hard device:%s\n ", ss.str().c_str());
+	printf("func::ListSupportedHD - Supported hard device:%s\n ", ss.str().c_str());
 }
 
 void StreamMangement::ListDshowDevice()
@@ -91,7 +91,7 @@ bool StreamMangement::StartDecode(const StreamInfo& infoStream)
 		m_bExit = false;
 
 		//重连
-		m_thChkConnect = std::thread(std::bind(&StreamMangement::m_check_connect, this));
+		//m_thChkConnect = std::thread(std::bind(&StreamMangement::m_check_connect, this));
 
 		//把rtsp视频单元转移到全局队列以作识别业务处理
 		if (infoStream.bSavePic) {
@@ -194,7 +194,7 @@ void StreamMangement::m_check_connect() {
 			{
 			case CameraConnectingStatus::InDisConnencted:  //意外断开 请求重连
 			{
-				StopDecode();
+				StopDecode(); 
 				LOG(INFO) << "RTSP OF CAMERA RECONNECTING....(case=InDisConnencted) Status=" << std::to_string((int)cameraConnectingStatus);
 				StartDecode(m_infoStream);
 				break;
@@ -217,7 +217,7 @@ void StreamMangement::m_check_connect() {
 
 			//默认60秒运行一次重连 过于频密影响效能
 			SHARED_LOCK(m_mtCheck);
-			m_cvCheck.wait_for(locker, std::chrono::milliseconds(60000), [this]() {
+			m_cvCheck.wait_for(locker, std::chrono::milliseconds(60000*15), [this]() {
 				auto exit = m_bExit.load();
 				//TEST 检查是否处于退出状态
 				//std::cout << "\nfunc::m_check_connect exit =" << exit << "\n" << std::endl;

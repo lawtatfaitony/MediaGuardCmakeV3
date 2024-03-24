@@ -19,6 +19,7 @@ namespace fs = std::filesystem;
 int RtspStreamHandle::read_interrupt_cb(void* pContext)
 {
 	av_log(NULL, AV_LOG_INFO, "func::read_interrupt_cb  \n");
+	LOG(INFO) << "[RtspStreamHandel::read_interrupt_cb]";
 	return 0;
 }
 
@@ -277,6 +278,7 @@ bool RtspStreamHandle::open_codec_context(int& nStreamIndex, AVCodecContext** pD
 	}
 	nStreamIndex = stream_index;
 	AVPixelFormat nPixeFmt = AV_PIX_FMT_NONE;
+
 	if (AVMEDIA_TYPE_VIDEO == nMediaType && m_infoStream.nHDType > AV_HWDEVICE_TYPE_NONE)
 	{
 		// get hard device
@@ -510,14 +512,14 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 		return false;
 	}
 
-#ifdef _WIN32
-	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-#elif __linux__
-	// 编码导致的?
-	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-#endif
+//#ifdef _WIN32
+//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
+//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
+//#elif __linux__
+//	// 编码导致的?
+//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
+//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
+//#endif
 
 	for (auto nIndex = 0; nIndex < m_pInputAVFormatCtx->nb_streams; ++nIndex)
 	{
@@ -649,6 +651,7 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 	const fs::path hls_path__filename_index_m3u8 = hls_camera_path / "index.m3u8";
 	 
 	std::vector<std::string> vecFile;
+
 	File::GetFilesOfDir(hls_camera_path.string(), vecFile);
 
 	for (size_t i = 0; i < vecFile.size(); i++) {
@@ -684,6 +687,7 @@ void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
 			}*/
 		}
 	}
+	vecFile.clear();
 }
 
 void RtspStreamHandle::close_output_stream()

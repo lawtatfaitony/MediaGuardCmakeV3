@@ -151,12 +151,15 @@ public:
 	/*
 	* 判斷是否是一個文件夾
 	*/
-	static bool isDirectory(const std::string& path) {
-		struct stat info;
-		if (stat(path.c_str(), &info) != 0) {
-			return false;
+	static bool isDirectory(const std::string& path) { 
+		if (fs::is_directory(path))
+		{
+			return true;
 		}
-		return (info.st_mode & S_IFDIR);
+		else
+		{
+			return false;
+		} 
 	}
 
 	/*

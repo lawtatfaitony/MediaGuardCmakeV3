@@ -39,7 +39,7 @@
     "videoRemainMinutes": 15,
     "storageLimitedbytes": 502400001,
     "ffmpegOpenInfo": false,
-    "nHDType": "kHWDeviceTypeCUDA",
+    "nHDType": "kHWDeviceTypeNone",
     "nHDTypeRemark": {
       "remarks": "硬件解碼類型",
       "hdtype": [

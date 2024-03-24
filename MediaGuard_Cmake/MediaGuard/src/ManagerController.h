@@ -1,10 +1,18 @@
 ﻿#pragma once
-#include "Common.h"
+#include <iostream>
+#include <string>
 #include <vector>
-#include <errno.h>
-#include <list> 
-#include <memory> 
+#include <fstream>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <list>
+#include <memory>
+#include <string>
+#include <errno.h> 
+#include <signal.h>
 #include "StreamManager.h"
+
 class ManagerController
 {
 	typedef std::list<std::shared_ptr<StreamMangement>> StreamPtrList; //用於 函數 run_media_batch_list

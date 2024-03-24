@@ -1,10 +1,5 @@
 ﻿#pragma once
-#include <iostream>
-#include <string>
-#include <vector>
-#include <fstream>
-#include <atomic>
-#include <chrono>
+
 #ifdef _WIN32
 #include <io.h>
 #endif
@@ -13,13 +8,10 @@
 #include "ManagerController.h" 
 #include "StreamHandle.h"
 #include "StreamManager.h"
-#include <signal.h>
-#include "./interface/CameraMpeg.h"
-#include <list>
-#include <memory>
+#include "./interface/CameraMpeg.h" 
 #include "httpserver/comm.h"
 #include "httpserver/httpserver.h"
-#include <string>
+
 
 using namespace Stream;
 
@@ -340,6 +332,8 @@ void ManagerController::Uninit()
 void ManagerController::clean_picture(int64_t picRemainMinutes)
 {
 	const fs::path picture_path = fs::current_path().append("picture"); //ManagerController::current_working_directory();
+	//TEST  clean_picture
+	LOG(INFO) << "[TEST] [func::clean_picture] picture_path:" << picture_path << "\n";
 
 	//tu-tu said:
 	//c++17 跨平台 std::fs::current_path() 
@@ -352,7 +346,7 @@ void ManagerController::clean_picture(int64_t picRemainMinutes)
 	std::vector<std::string> vecFile;
 	File::GetFilesOfDir(picture_path.string(), vecFile);
 
-	//清理过时图片，测试完毕 注释掉
+	//TEST 清理过时图片，测试完毕 注释掉
 	LOG(INFO) << "[FUNC::clean_picture] picRemainMinutes:" << picRemainMinutes << " vecFiles =" << vecFile.size()<<"\n";
 
 	for (size_t i = 0; i < vecFile.size(); i++) {

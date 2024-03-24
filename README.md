@@ -20,7 +20,7 @@ ncurses 函式庫是一個用於在終端窗口中創建文字用戶界面（TUI
 
  
 
-#### 注意: MediaGuard_Cmake.RAR 不包含 3rdlib 子文件夾,由於太冗餘和龐大的文件數量,需要從 3rdlib.rar下載下來後 複製到根目錄下
+#### 注意: MediaGuard_Cmake.RAR 不包含 3rdlib 子文件夾,由於太冗餘和龐大的文件數量,需要從 3rdlib.rar下載下來後 複製到根目錄下  3rdlib  : https://www.123pan.com/s/kDKPjv-Ed3l3.html 提取码:8uT1
 
 ### 頭文件
 
@@ -175,3 +175,7 @@ Read frame failed,Code[-541478725]:End of file
 
 ###
 關於App Path,如果编译器支持C++17，则建议使用std::filesystem::current_path
+
+### 使用cmd命令開通 防火墻端口 5005
+
+netsh advfirewall firewall add rule name="開啟端口 5005" dir=in action=allow protocol=TCP localport=5005

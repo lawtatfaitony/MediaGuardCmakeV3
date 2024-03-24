@@ -4,6 +4,7 @@
 #include "StreamHandle.h" 
 #include "Time.h"  
 #include "../Common/CvMatToBase64.h"
+#include "File.h" 
 
 //#pragma warning(push, 0)  //本來為了解決Enum Class的警告提示的，但不起作用
 //#include <../ffmpeg/include/libavutil/avutil.h>
@@ -64,10 +65,7 @@ private:
 	void av_packet_rescale_hls_ts(AVPacket* pkt, AVRational src_tb, AVRational dst_tb);
 	
 	void clean_hls_ts_run();
-	/*
-	* 獲取當前 index.m38u的ts文件列表
-	*/
-	std::vector<std::string> parse_index_m3u8(const std::string& index_m3u8_path);
+	
 	/*
 	* 清理hls产生的ts文件
 	*/

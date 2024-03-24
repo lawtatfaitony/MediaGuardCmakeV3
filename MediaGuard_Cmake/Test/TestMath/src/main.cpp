@@ -7,7 +7,7 @@
 
 
 //$(ProjectDir)include\ 其他包含目錄 加入這句
-#include "File.h"
+
 #include "Time.h"
 #include <thread>
 #include <mutex>
@@ -35,8 +35,7 @@ int main()
 	  
 	std::cout << "Hello test  not use" << std::endl;
 	 
-	std::cout << "File::MorkPath"<< File::GetWorkPath() << std::endl;
-      
+	  
 
 	return 0;
 }
