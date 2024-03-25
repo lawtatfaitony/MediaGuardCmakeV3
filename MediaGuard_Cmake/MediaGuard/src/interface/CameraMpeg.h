@@ -2,8 +2,8 @@
 #include <string>
 #ifdef _WIN32
 #include <Time.h> 
-#elif __linux__
-// 请自己补linux内容
+#elif __linux__ 
+#include <time.h>  // 请自己补linux内容
 #endif
 #include <sstream> 
 #include <stdbool.h> 

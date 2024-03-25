@@ -11,27 +11,27 @@
 #include "rapidjson/writer.h"
 
 static const char kWindowSplash = '\\';
-static const char kLinuxSplash = '/';
+static const char kLinuxSplash = '/'; 
 #ifdef _WIN32
 static const char kSeprator = kWindowSplash;
 #elif __linux__
-static const char kSeprator = kLinuxSplash;
+static const char kSeprator = kLinuxSplash; 
 #endif
 
 namespace fs = std::filesystem;
 
-class File1
+class File
 {
 	static const int kSuccess = 0;
 	static const int kError = -1;
 public:
-
+	 
 	/*獲取 應用程式根路徑*/
 	static std::string GetWorkPath()
 	{
-		const fs::path rootPath = fs::current_path();
+		const fs::path rootPath = fs::current_path(); 
 		//std::cout << "APPCLICATION ROOT PATH (from File::GetWorkPath) : " << rootPath << std::endl;
-		return rootPath.string();
+		return rootPath.string(); 
 	}
 
 	/*
@@ -55,7 +55,7 @@ public:
 	* @return:      bool, success to return true, or false
 	*/
 	static bool CreateSingleDirectory(const std::string& strDir)
-	{
+	{ 
 		try {
 			// 使用 std::filesystem 創建目錄
 			fs::create_directory(strDir);
@@ -76,7 +76,7 @@ public:
 	* @return:      bool, success to return true, or false
 	*/
 	static bool CreateMultiDirectory(const std::string& strDir)
-	{
+	{ 
 		if (isDirectoryExists(strDir))
 			return true;
 
@@ -101,27 +101,27 @@ public:
 	* 转换: FileTime --> LocalTime
 	* FileTimeToSystemTime(&ftCreate, &stUTC1);
 	* SystemTimeToTzSpecificLocalTime(NULL, &stUTC1, &stLocal1);
-	*/
+	*/  
 	static bool get_file_info(const std::string& strFilePath, int& iCreateTime, int& iModifyTime, int& iAccessTime, int& iFileLen) {
 		try {
 			fs::path filepath(strFilePath);
 
 			if (!fs::exists(filepath)) {
-				std::cerr << "File::get_file_info File Not Exist : " << strFilePath << std::endl;
+				std::cerr << "\nFile::get_file_info File Not Exist : " << strFilePath << "\n" << std::endl;
 				return false;
 			}
 
 			auto fileStatus = fs::status(filepath);
-
-			iFileLen = static_cast<int>(fs::file_size(filepath));
-			auto lstTime = fs::last_write_time(filepath);
-			iModifyTime = std::chrono::duration_cast<std::chrono::milliseconds>(lstTime.time_since_epoch()).count();
+		 
+			iFileLen = static_cast<int>(fs::file_size(filepath)); 
+			auto lstTime = fs::last_write_time(filepath); 
+			iModifyTime = std::chrono::duration_cast<std::chrono::milliseconds>(lstTime.time_since_epoch()).count();    
 			iAccessTime = iModifyTime;  //先應付需求,後續解決
 			iCreateTime = iModifyTime;  //先應付需求,後續解決
-
+			 
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Error while getting file info: " << e.what() << std::endl;
+			std::cerr << "\nError while getting file info: " << e.what() << "\n" << std::endl;
 			return false;
 		}
 
@@ -130,33 +130,36 @@ public:
 	/*
 	* 刪除目錄 std::string directoryPath = "path/to/your/directory"; // 指定要刪除的目錄路徑
 	* removeDirectory(directoryPath);
-	*/
+	*/ 
 	static void removeDirectory(const std::string& path) {
 		try {
 			fs::path directoryPath(path);
 
 			if (fs::exists(directoryPath)) {
 				fs::remove_all(directoryPath);
-				std::cout << "File::removeDirectory Directory removed: " << path << std::endl;
+				std::cout << "\nFile::removeDirectory Directory removed: " << path << "\n" << std::endl;
 			}
 			else {
-				std::cerr << "File::removeDirectory Directory does not exist: " << path << std::endl;
+				std::cerr << "\nFile::removeDirectory Directory does not exist: " << path << "\n" << std::endl;
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << "File::removeDirectory Error while removing directory: " << e.what() << std::endl;
+			std::cerr << "\nFile::removeDirectory Error while removing directory: " << e.what() << "\n" << std::endl;
 		}
 	}
 
 	/*
 	* 判斷是否是一個文件夾
 	*/
-	static bool isDirectory(const std::string& path) {
-		struct stat info;
-		if (stat(path.c_str(), &info) != 0) {
-			return false;
+	static bool isDirectory(const std::string& path) { 
+		if (fs::is_directory(path))
+		{
+			return true;
 		}
-		return (info.st_mode & S_IFDIR);
+		else
+		{
+			return false;
+		} 
 	}
 
 	/*
@@ -170,10 +173,11 @@ public:
 			std::cerr << "\nFile::deleteFile File Not Exist : " << filepath.string() << "\n" << std::endl;
 			return false;
 		}
-
-		if (fs::remove(filepath) == true) {
+		  
+		if (fs::remove(filepath) == true) { 
 			//TEST 
-			std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
+			
+			//std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
 
 			return true;
 		}
@@ -196,7 +200,7 @@ public:
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Error while reading directory: " << e.what() << std::endl;
+			std::cerr << "\nError while reading directory: " << e.what() << "\n" << std::endl;
 			return false;
 		}
 
@@ -212,7 +216,7 @@ public:
 			}
 		}
 	}
-
+	 
 	/* 判斷目錄是否存在 */
 	static bool isDirectoryExists(const std::string& directoryPath) {
 		fs::path pathToCheck(directoryPath);
@@ -221,7 +225,7 @@ public:
 	/*
 	* support the json file reading
 	* 讀取配置文件 deviceconfig.json
-	*/
+	*/ 
 	static std::string readJsonFile(const std::string& strFile)
 	{
 		std::string jsonString = "";
@@ -229,7 +233,7 @@ public:
 		const char* filename = strFile.c_str();
 		FILE* fp = fopen(filename, "rb");
 		if (!fp) {
-			std::cerr << "CAN NOT OPEN JSON FILE : " << filename << std::endl;
+			std::cerr << "\nCAN NOT OPEN JSON FILE : " << filename << "\n" << std::endl;
 			return jsonString;
 		}
 
@@ -240,7 +244,7 @@ public:
 		document.ParseStream(is);
 
 		if (document.HasParseError()) {
-			std::cerr << "PARSE  JSON FILE  ERROR OCCURED!!!" << strFile << std::endl;
+			std::cerr << "\nPARSE  JSON FILE  ERROR OCCURED!!!" << strFile << "\n" << std::endl;
 			fclose(fp);
 			return jsonString;
 		}

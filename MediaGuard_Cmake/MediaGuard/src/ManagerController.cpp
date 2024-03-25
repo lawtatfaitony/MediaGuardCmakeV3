@@ -135,6 +135,9 @@ void ManagerController::Init()
 				av_log_set_level(AV_LOG_ERROR);
 
 		}
+
+		// for clean hls index.m3u8 cache ts files 
+		m_thread_hls_clear = std::thread(std::bind(&ManagerController::clean_hls_ts_run, this));
 	}
 }
 
@@ -683,4 +686,125 @@ void ManagerController::create_main_media_folder()
 
 	if (!File::isDirectoryExists(hls_path.string()))
 		File::CreateSingleDirectory(hls_path.string());
+}
+
+
+/* testing for return a .ts file list from index.m3u8
+ * Target :  to  clean the .ts file exclude the index.m3u8 ts list files
+*/
+bool ManagerController::get_ts_list_file_from_index_m3u8(const std::string& path, std::vector<std::string>& vectorfiles)
+{
+	if (fs::exists(path))
+	{
+		std::ifstream file(path);
+
+		std::string line;
+
+		if (file.is_open()) {
+
+			while (std::getline(file, line)) {
+
+				if (!line.empty()) {
+					// Remove trailing spaces
+					while (std::isspace(line.back())) {
+						line.pop_back();
+					}
+
+					if (line != "index.m3u8" && line[0] != '#' && line.substr(line.size() - 4) != ".tmp") {
+
+						fs::path path(line);
+						if (path.extension() == ".ts") {
+							vectorfiles.push_back(line);
+							//TEST LOG
+							std::cout << "Add a file vectorfiles " << line << std::endl;
+						}
+						else {
+							vectorfiles.push_back(line);
+							//TEST LOG
+							std::cout << "no .ts file contained,discard to add to ts file list" << line << std::endl;
+						}
+					}
+				}
+			}
+			file.close();
+			return true;
+		} 
+	}
+	else {
+		//no index.m3u8
+		std::cout << "no index.m3u8 file in app root" << std::endl;
+	}
+
+	// no any ts list or no index.m3u8 files
+	return false;
+}
+
+
+void ManagerController::delete_ts_list_file(const std::string& hls_cmaera_id_folder, std::vector<std::string>& vector_ts_files_index_m3u8)
+{
+	if (fs::is_directory(hls_cmaera_id_folder))
+	{
+		std::vector<std::string> vector_ts_files;
+		if (File::GetFilesOfDir(hls_cmaera_id_folder, vector_ts_files) == true)
+		{
+			if (vector_ts_files.size() > 0)
+			{
+				for (std::vector<std::string>::iterator it = vector_ts_files.begin(); it != vector_ts_files.end(); ++it) {
+
+					std::cout << *it << std::endl;
+
+					if (std::find(vector_ts_files_index_m3u8.begin(), vector_ts_files_index_m3u8.end(), *it) == vector_ts_files_index_m3u8.end()) {
+						
+						File::deleteFile(*it);
+					}
+					else {
+						++it;
+					}
+				}
+				vector_ts_files.clear(); 
+			} 
+		}  
+	} 
+	return ;
+}
+
+ 
+void ManagerController::clean_each_hls_camera_folder()
+{ 
+	CameraMpeg cameraMpeg; 
+	Service::StreamInfoApiList sList;
+	int nCode = cameraMpeg.camera_list(sList);
+	if (nCode != CP_OK)
+	{
+		LOG(INFO) << "func::ManagerController.clean_each_hls_camera_folder -> GET CAMERA LIST FROM CLOUD FAIL!!!";
+	}
+	Service::StreamInfoApiList::iterator itr;
+	for (itr = sList.begin(); itr != sList.end(); ++itr)
+	{ 
+		 int camera_id = itr->nCameraId;
+		 const fs::path hls_camera_folder = fs::current_path() / kHlsDir / std::to_string(camera_id);
+		 std::vector<std::string> vector_ts_files_index_m3u8 ;
+		 bool ret = get_ts_list_file_from_index_m3u8(hls_camera_folder.string(),vector_ts_files_index_m3u8);
+		 if (ret == true)
+		 {
+			 delete_ts_list_file(hls_camera_folder.string(), vector_ts_files_index_m3u8);
+		 }
+		 vector_ts_files_index_m3u8.clear();
+	} 
+}
+
+
+void ManagerController::clean_hls_ts_run()
+{ 
+	while (!m_bExit.load())
+	{
+		//TEST
+		LOG(INFO) << "func::ManagerController.clean_hls_ts_run -> TESTING!!!";
+		clean_each_hls_camera_folder();
+		SHARED_LOCK(m_mtLock);  // std::unique_lock<std::mutex> locker(lock);
+		m_cvCond.wait_for(locker, std::chrono::milliseconds(60000), [this]() {  //60's
+			auto isExit = m_bExit.load();
+			return isExit;
+		});
+	}
 }

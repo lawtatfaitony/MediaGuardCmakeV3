@@ -85,7 +85,7 @@ bool RtspStreamHandle::StartDecode(const StreamInfo& infoStream)
 		File::CreateSingleDirectory(hls_camera_path.string());
 
 	//启动定时清理ts切片，保留最近30秒的 規則改為 只保留index.m3u8包含的文件
-	m_thHlsClear = std::thread(std::bind(&RtspStreamHandle::clean_hls_ts_run, this));
+	//m_thHlsClear = std::thread(std::bind(&RtspStreamHandle::clean_hls_ts_run, this));
 	 
 	//------------------------------------------------------------------------------------
 	return start_decode();
@@ -485,7 +485,7 @@ bool RtspStreamHandle::open_output_stream(AVFormatContext*& pFormatCtx, bool bRt
 	return true;
 }
 
-bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int nStreamDecodeType)
+bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int nStreamDecodeType)   
 {
 	StreamDecodeType streamDecodeType = (StreamDecodeType)nStreamDecodeType;
 
@@ -573,20 +573,22 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 		if (nCode < 0)
 		{
 			std::string strError = "Can't open output io, file:" + strOutputPath + ",errcode:" + std::to_string(nCode) + ", err msg:"
-				+ get_error_msg(nCode) + "/t line 524";
+				+ get_error_msg(nCode) + "/t line 572";
 			printf("%s \n", strError.c_str());
 			return false;
 		}
 		if (streamDecodeType == StreamDecodeType::HLS)
 		{
 			/*
-			参数参考 https://www.cnblogs.com/michong2022/p/17016423.html
+			 * 参数参考 https://www.cnblogs.com/michong2022/p/17016423.html
 			*/
-			av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN); //是否直播 出错
-			av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN); //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+			av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN);      //是否直播 出错
+			av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN);   //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
 			av_opt_set(pFormatCtx->priv_data, "hls_wrap", "8", AV_OPT_SEARCH_CHILDREN);
-			av_opt_set(pFormatCtx->priv_data, "hls_time", "3", AV_OPT_SEARCH_CHILDREN); //默认2seconds 
-
+			av_opt_set(pFormatCtx->priv_data, "hls_time", "3", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
+			av_opt_set(pFormatCtx->priv_data, "hls_flags", "0", AV_OPT_SEARCH_CHILDREN);
+			//---------------------------------------------------------------------------------- 
+			  
 			//LOG(INFO) << "avio_open success and av_opt_set params hls_list_size = 8" << strOutputPath; 
 		}
 	}
@@ -615,9 +617,11 @@ void RtspStreamHandle::write_output_hls_stream(AVFormatContext* pFormatCtx, cons
 	if (nullptr == packet.buf || 0 == packet.buf->size) {
 		return;
 	}
-	AVPacket pktFrame /*= packet*/;
+
+	AVPacket pktFrame ;
 	av_init_packet(&pktFrame);
 	av_packet_ref(&pktFrame, &packet);
+
 	AVStream* pInStream = m_pInputAVFormatCtx->streams[pktFrame.stream_index];
 	AVStream* pOutStream = pFormatCtx->streams[pktFrame.stream_index];
 
@@ -625,12 +629,17 @@ void RtspStreamHandle::write_output_hls_stream(AVFormatContext* pFormatCtx, cons
 
 	int nError = av_interleaved_write_frame(pFormatCtx, &pktFrame);
 
+	//// 清理 ts分段文件  無效 屏蔽掉
+	//AVDictionary* dict = NULL;
+	//av_dict_set(&dict, "hls_list_size", "2", 0);
+	//av_dict_set(&dict, "hls_flags", "delete_segments", 0);
+	 
 	if (nError != 0)
 	{
 		printf("Error: %d while write_output_hls_stream write packet frame, %s\n", nError, get_error_msg(nError).c_str());
+		return;
 	}
-	//printf("\nSuccess to av_interleaved_write_frame \n");
-
+	//printf("\nSuccess to av_interleaved_write_frame \n"); 
 	return;
 }
 
@@ -644,68 +653,69 @@ void RtspStreamHandle::av_packet_rescale_hls_ts(AVPacket* pkt, AVRational src_tb
 		pkt->duration = av_rescale_q(pkt->duration, src_tb, dst_tb);
 }
 
-void RtspStreamHandle::clean_hls_ts_run()
-{
-	if (m_infoStream.nStreamDecodeType != StreamDecodeType::HLS)
-	{
-		//必须是HLS流请求才继续执行ts切片清理
-		return;
-	}
-	while (!m_bExit.load())
-	{ 
-		clean_hls_ts(30); //保留20秒的文件记录 注意设置hls av_dist的时候不能大于这个时间，
-		SHARED_LOCK(m_mtLock);
-		m_cvCond.wait_for(locker, std::chrono::milliseconds(60000), [this]() {  //60's
-			auto isExit = m_bExit.load();
-			return isExit;
-			});
-	}
-}
+//void RtspStreamHandle::clean_hls_ts_run()
+//{
+//	if (m_infoStream.nStreamDecodeType != StreamDecodeType::HLS)
+//	{
+//		 
+//		//必须是HLS流请求才继续执行ts切片清理
+//		return;
+//	}
+//	while (!m_bExit.load())
+//	{ 
+//		clean_hls_ts(30); //保留20秒的文件记录 注意设置hls av_dist的时候不能大于这个时间，
+//		SHARED_LOCK(m_mtLock);  // std::unique_lock<std::mutex> locker(lock);
+//		m_cvCond.wait_for(locker, std::chrono::milliseconds(60000), [this]() {  //60's
+//			auto isExit = m_bExit.load();
+//			return isExit;
+//		});
+//	}
+//}
   
-void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
-{
-	const fs::path hls_camera_path = fs::current_path() / kHlsDir / std::to_string(m_infoStream.nCameraId);
-	const fs::path hls_path__filename_index_m3u8 = hls_camera_path / "index.m3u8";
-	 
-	std::vector<std::string> vecFile;
-
-	File::GetFilesOfDir(hls_camera_path.string(), vecFile);
-
-	for (size_t i = 0; i < vecFile.size(); i++) {
-		 
-		int iCreateTime, iModifyTime, iAccessTime, iFileLen;
-
-		const std::string ts_path_filename = vecFile[i].c_str();
-
-		if (true == File::get_file_info(ts_path_filename, iCreateTime, iModifyTime, iAccessTime, iFileLen))
-		{
-			//获取多少分钟前的时间
-			std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-			std::chrono::system_clock::time_point before_minutes_time = curr - std::chrono::seconds(tsRemainSeconds);
-			auto longremaintime = std::chrono::duration_cast<std::chrono::seconds>(before_minutes_time.time_since_epoch());
-			int64_t longCreateTime = static_cast<int64_t>(iCreateTime);
-			if (longCreateTime < longremaintime.count())
-			{ 
-				try {
-
-					File::deleteFile(ts_path_filename);
-				}
-				catch (const std::exception& ex) {
-					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: " << ex.what() << "\n" << ts_path_filename << std::endl;
-				}
-				catch (...) {
-					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: Unknown exception" << std::endl;
-				}
-
-			}
-			//for TEST
-			else {
-				LOG(INFO) << Time::GetCurrentSystemTime() << "[file not in " << tsRemainSeconds << " seconds ago]" << " file create:" << longCreateTime << "-" << iCreateTime << " | " << longremaintime.count();
-			}
-		}
-	}
-	vecFile.clear();
-}
+//void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
+//{
+//	const fs::path hls_camera_path = fs::current_path() / kHlsDir / std::to_string(m_infoStream.nCameraId);
+//	const fs::path hls_path__filename_index_m3u8 = hls_camera_path / "index.m3u8";
+//	 
+//	std::vector<std::string> vecFile;
+//
+//	File::GetFilesOfDir(hls_camera_path.string(), vecFile);
+//
+//	for (size_t i = 0; i < vecFile.size(); i++) {
+//		 
+//		int iCreateTime, iModifyTime, iAccessTime, iFileLen;
+//
+//		const std::string ts_path_filename = vecFile[i].c_str();
+//
+//		if (true == File::get_file_info(ts_path_filename, iCreateTime, iModifyTime, iAccessTime, iFileLen))
+//		{
+//			//获取多少分钟前的时间
+//			std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
+//			std::chrono::system_clock::time_point before_minutes_time = curr - std::chrono::seconds(tsRemainSeconds);
+//			auto longremaintime = std::chrono::duration_cast<std::chrono::seconds>(before_minutes_time.time_since_epoch());
+//			int64_t longCreateTime = static_cast<int64_t>(iCreateTime);
+//			if (longCreateTime < longremaintime.count())
+//			{ 
+//				try {
+//
+//					File::deleteFile(ts_path_filename);
+//				}
+//				catch (const std::exception& ex) {
+//					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: " << ex.what() << "\n" << ts_path_filename << std::endl;
+//				}
+//				catch (...) {
+//					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: Unknown exception" << std::endl;
+//				}
+//
+//			}
+//			//for TEST
+//			else {
+//				LOG(INFO) << Time::GetCurrentSystemTime() << "[file not in " << tsRemainSeconds << " seconds ago]" << " file create:" << longCreateTime << "-" << iCreateTime << " | " << longremaintime.count();
+//			}
+//		}
+//	}
+//	vecFile.clear();
+//}
 
 
 void RtspStreamHandle::close_output_stream()
@@ -798,6 +808,7 @@ void RtspStreamHandle::do_decode()
 	printf("\nReading ended,CameraId=%i read %llu\n", m_infoStream.nCameraId, nFrame);
 	printf("\n------------------------------------------------------------------------------\n");
 }
+
 //队列处理
 void RtspStreamHandle::push_packet(const AVPacket& packet)
 {
@@ -1032,7 +1043,7 @@ void RtspStreamHandle::release_output_format_context(AVFormatContext*& pFmtConte
 
 		start_time = av_gettime(); //重新记录一个新的开始时间
 
-		LOG(INFO) << "Finished file " << m_infoStream.mediaFormate << " - " << m_path_filename << ",if again then record start_time =" << start_time;
+		LOG(INFO) << "Finished file " << m_infoStream.mediaFormate << " - " << m_path_filename << ",if again then record start_time =" << start_time << "\n";
 
 		if (!(pFmtContext->oformat->flags & AVFMT_NOFILE))
 		{

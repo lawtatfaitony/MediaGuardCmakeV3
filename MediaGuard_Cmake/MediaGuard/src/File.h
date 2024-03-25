@@ -112,7 +112,7 @@ public:
 			}
 
 			auto fileStatus = fs::status(filepath);
-			 
+		 
 			iFileLen = static_cast<int>(fs::file_size(filepath)); 
 			auto lstTime = fs::last_write_time(filepath); 
 			iModifyTime = std::chrono::duration_cast<std::chrono::milliseconds>(lstTime.time_since_epoch()).count();    

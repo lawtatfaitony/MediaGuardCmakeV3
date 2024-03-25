@@ -166,16 +166,40 @@ cmake指令是：add_definitions(-DUNICODE -D_UNICODE)
 # 常量字符初始化
 wstring a = L"啊啊啊啊啊";
 wchar_t b[] = {L'哈', L'呵'};  
-###
-----------------------------------------------------------  
-swscaler @ 000001e81e060380] Warning: data is not aligned! This can lead to a speed loss  这是初始化包造成的 av_init_packet(&pktFrame);
-----------------------------------------------------------  
-###
-Read frame failed,Code[-541478725]:End of file
 
-###
-關於App Path,如果编译器支持C++17，则建议使用std::filesystem::current_path
+# vs自带功能通过ssh+gdb自动远程调试
 
-### 使用cmd命令開通 防火墻端口 5005
+在Visual Studio中，可以通过SSH直接连接到远程计算机并使用GDB进行自动远程调试。以下是如何设置和启动远程调试会话的步骤：
 
-netsh advfirewall firewall add rule name="開啟端口 5005" dir=in action=allow protocol=TCP localport=5005
+1. 打开Visual Studio。
+2. 创建一个新的项目或打开现有的项目。
+3. 右键点击解决方案资源管理器中的项目，选择“属性”。
+4. 导航到“配置属性” -> “调试”。
+5. 在“远程调试器”部分，设置“远程命令”为GDB的路径，例如：`/usr/bin/gdb`。
+6. 设置“远程服务器名称”为远程设备的IP地址或主机名。
+7. 在“远程路径”中，指定远程机器上可执行文件的路径。
+8. 在“调试器类型”中，选择“远程（GDB）”。
+9. 确保在“调试器选项”中，你可以指定任何GDB特定的启动参数，如指定特定的GDB客户端端口。
+10. 配置SSH连接，确保你的远程机器上安装了SSH服务，并且你有权限通过SSH连接。
+11. 在“配置属性” -> “链接器” -> “调试”中，设置“生成调试信息”为“是”。
+12. 在“系统属性”中，确保目标机器的架构（x86或x64）与你的本地机器相匹配。
+13. 点击“确定”保存设置。
+14. 点击“本地Windows调试器”旁边的下拉菜单，选择“远程Windows调试器”或“远程Linux调试器”，取决于你的远程系统类型。
+15. 点击“开始调试”或按F5开始远程调试会话。
+
+注意：确保远程机器上已经安装了GDB，并且你有足够的权限来执行GDB和调试你的程序。如果你的程序依赖于特定的库或环境，你需要确保这些在远程机器上也是可用的。
+
+### 更新一個boost 1_63_0庫 到
+
+tar -zxvf boost_1_63_0.tar.gz
+cd boost_1_63_0
+#编译boost库，全库编译
+./bootstrap.sh --with-toolset=gcc link=static threading=multi runtime-link=static --with-libraries=all
+
+####  boost 1_83_0庫 指令
+
+tar -zxvf boost_1_83_0.tar.gz
+cd boost_1_83_0
+
+./bootstrap.sh --with-toolset=gcc link=static threading=multi runtime-link=static --with-libraries=all
+

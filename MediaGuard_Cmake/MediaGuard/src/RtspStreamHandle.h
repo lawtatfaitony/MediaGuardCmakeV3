@@ -64,12 +64,11 @@ private:
 	*/
 	void av_packet_rescale_hls_ts(AVPacket* pkt, AVRational src_tb, AVRational dst_tb);
 	
-	void clean_hls_ts_run();
-	
-	/*
-	* 清理hls产生的ts文件
-	*/
-	void clean_hls_ts(int tsRemainSecond);
+	//void clean_hls_ts_run();
+	///*
+	//* 清理hls产生的ts文件
+	//*/
+	//void clean_hls_ts(int tsRemainSecond);
 
 	/*
 	关闭输出STREAM
