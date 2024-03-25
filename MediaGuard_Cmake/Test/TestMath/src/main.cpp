@@ -40,7 +40,9 @@ int main()
 	std::cout << "Hello test  not use" << std::endl;
 	
 	//=================================
-
+    /* testing for return a .ts file list from index.m3u8
+     * Target :  to  clean the .ts file exclude the index.m3u8 ts files
+    */
     std::ifstream file("index.m3u8");
     std::vector<std::string> vectorfiles;
     std::string line;
