@@ -2,3 +2,4 @@ MediaGuard_Cmake/build/
 MediaGuard_Cmake/output/
 MediaGuard_Cmake/Output/
 MediaGuard_Cmake/build/ALL_BUILD.vcxproj
+MediaGuard_Cmake/MediaGuard/src/conf/main_company_detais_by_serialno.json
