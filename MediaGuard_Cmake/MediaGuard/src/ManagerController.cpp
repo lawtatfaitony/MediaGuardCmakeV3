@@ -350,7 +350,7 @@ void ManagerController::clean_picture(int64_t picRemainMinutes)
 	File::GetFilesOfDir(picture_path.string(), vecFile);
 
 	//TEST 清理过时图片，测试完毕 注释掉
-	LOG(INFO) << "[FUNC::clean_picture] picRemainMinutes:" << picRemainMinutes << " vecFiles =" << vecFile.size()<<"\n";
+	//LOG(INFO) << "[FUNC::clean_picture] picRemainMinutes:" << picRemainMinutes << " vecFiles =" << vecFile.size()<<"\n";
 
 	for (size_t i = 0; i < vecFile.size(); i++) {
 		  
@@ -396,7 +396,7 @@ void ManagerController::clean_video_store()
 	if (g_GlobalSetting.storageLimitedbytes == 0) //不限制容量
 		return;
 
-	fs::path video_path = fs::current_path().append("video");
+	const fs::path video_path = fs::current_path().append("video");
 	 
 	if (!fs::is_directory(video_path))
 	{

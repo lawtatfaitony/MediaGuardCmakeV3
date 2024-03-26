@@ -426,15 +426,6 @@ bool RtspStreamHandle::open_output_stream(AVFormatContext*& pFormatCtx, bool bRt
 		return false;
 	}
 	 
-//#ifdef _WIN32
-//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-//#elif __linux__
-//	// 编码导致的?
-//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;  
-//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-//#endif
-	 
 	for (auto nIndex = 0; nIndex < m_pInputAVFormatCtx->nb_streams; ++nIndex)
 	{
 		AVStream* pInStream = m_pInputAVFormatCtx->streams[nIndex];
@@ -558,7 +549,7 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 		if (nCode < 0)
 		{
 			std::string strError = "Can't open output io, file:" + strOutputPath + ",errcode:" + std::to_string(nCode) + ", err msg:"
-				+ get_error_msg(nCode) + "/t line 572";
+				+ get_error_msg(nCode) + "/t line 552";
 			printf("%s \n", strError.c_str());
 			return false;
 		}
@@ -573,11 +564,13 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 		av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN);      //是否直播 出错
 		av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN);   //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
 		av_opt_set(pFormatCtx->priv_data, "hls_wrap", "8", AV_OPT_SEARCH_CHILDREN);
-		av_opt_set(pFormatCtx->priv_data, "hls_time", "3", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
+		av_opt_set(pFormatCtx->priv_data, "hls_time", "6", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
 		av_opt_set(pFormatCtx->priv_data, "hls_flags", "0", AV_OPT_SEARCH_CHILDREN);
 		//---------------------------------------------------------------------------------- 
-		//TEST
-		LOG(INFO) << "StreamDecodeType::HLS and av_opt_set params hls_list_size = 8 \n" << strOutputPath; 
+#ifdef DEBUG
+		LOG(INFO) << "StreamDecodeType::HLS and av_opt_set params hls_list_size = 8 hls_time = 6's \n" << strOutputPath;
+#endif // DEBUG
+		
 	}
 	//写文件头
 	nCode = avformat_write_header(pFormatCtx, NULL);
@@ -621,7 +614,7 @@ void RtspStreamHandle::write_output_hls_stream(AVFormatContext* pFormatCtx, cons
 		printf("Error: %d while write_output_hls_stream write packet frame, %s\n", nError, get_error_msg(nError).c_str());
 		return;
 	}
-	//printf("\nSuccess to av_interleaved_write_frame \n"); 
+	 
 	return;
 }
 

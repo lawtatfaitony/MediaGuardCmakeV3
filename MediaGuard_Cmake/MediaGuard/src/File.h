@@ -175,9 +175,12 @@ public:
 		}
 		  
 		if (fs::remove(filepath) == true) { 
-			//TEST 
 			
-			//std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
+#ifdef DEBUG
+			std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
+#endif // DEBUG
+
+			
 
 			return true;
 		}

@@ -3,3 +3,14 @@ MediaGuard_Cmake/output/
 MediaGuard_Cmake/Output/
 MediaGuard_Cmake/build/ALL_BUILD.vcxproj
 MediaGuard_Cmake/MediaGuard/src/conf/main_company_detais_by_serialno.json
+MediaGuard_Cmake/Output/Debug/conf/config.json
+MediaGuard_Cmake/Output/Debug/conf/deviceUtf8.json
+MediaGuard_Cmake/Output/Debug/CustomLib.lib
+MediaGuard_Cmake/Output/Debug/CustomLib.pdb
+MediaGuard_Cmake/Output/Debug/HelloWorld.lib
+MediaGuard_Cmake/Output/Debug/HelloWorld.pdb
+MediaGuard_Cmake/Output/Debug/MathLibrary.dll
+MediaGuard_Cmake/Output/Debug/MathLibrary.exp
+MediaGuard_Cmake/Output/Debug/MathLibrary.pdb
+MediaGuard_Cmake/Output/Debug/MediaGuard.exe
+MediaGuard_Cmake/Output/Debug/MediaGuard.pdb

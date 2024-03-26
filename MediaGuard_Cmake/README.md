@@ -88,10 +88,6 @@ CameraMpeg::detect_and_handle 未改為脫機和聯機 互相撤換模式
 
 ​          `}] //單個數組`
 
-
-
-
-
 ### device.json 配置節點 [carPlateRecogBusiness]
 
 車牌識別：主要POST 到CarBusiness停車計時系統使用的。並且有具體的雲端API POST接口和限定鏡頭ID [permited_cameraId] list 等等
@@ -165,13 +161,39 @@ cmake指令是：add_definitions(-DUNICODE -D_UNICODE)
 
 # 常量字符初始化
 wstring a = L"啊啊啊啊啊";
-wchar_t b[] = {L'哈', L'呵'};  
-###
-----------------------------------------------------------  
-swscaler @ 000001e81e060380] Warning: data is not aligned! This can lead to a speed loss  这是初始化包造成的 av_init_packet(&pktFrame);
-----------------------------------------------------------  
-###
-Read frame failed,Code[-541478725]:End of file
+wchar_t b[] = {L'哈', L'呵'};   
 
 ###
 關於App Path,如果编译器支持C++17，则建议使用std::filesystem::current_path
+
+## 重大錯誤糾正(2024-3-27):
+
+hls無必要通過代碼來清理,只需要av_opt 設置選項對AvFormat傳入設置選項及可以
+
+```
+if (streamDecodeType == StreamDecodeType::HLS)
+	{
+		/*
+		 * 参数参考 https://www.cnblogs.com/michong2022/p/17016423.html
+		*/
+		av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN);      //是否直播 出错
+		av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN);   //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+		av_opt_set(pFormatCtx->priv_data, "hls_wrap", "8", AV_OPT_SEARCH_CHILDREN);
+		av_opt_set(pFormatCtx->priv_data, "hls_time", "6", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
+		av_opt_set(pFormatCtx->priv_data, "hls_flags", "0", AV_OPT_SEARCH_CHILDREN);
+		//---------------------------------------------------------------------------------- 
+#ifdef DEBUG
+		LOG(INFO) << "StreamDecodeType::HLS and av_opt_set params hls_list_size = 8 hls_time = 6's \n" << strOutputPath;
+#endif // DEBUG
+	}
+	//写文件头
+	nCode = avformat_write_header(pFormatCtx, NULL);  //這裡上面已經傳入option,所以這裡無需要傳入字典dict
+```
+
+##### 開發日誌(2024-3-27)
+
+CameraMpeg.cpp 下的 postvideo mp4到cloud 沒有判斷脫機處裡的問題 的.現在是獲取API token持續不斷的post錄像記錄到雲端.
+
+還有車牌識別也是持續不斷的返回雲端記錄. 
+
+#### 上述 要通過device.json 的 是否在線或者脫機工作來實現保存在本地數據庫還是雲端. 下一步計劃師建立本地sqlite數據庫記錄.sqlite 考慮到部署Linux系統比mysql方便.
