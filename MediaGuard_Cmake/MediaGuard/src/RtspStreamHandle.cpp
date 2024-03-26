@@ -512,32 +512,17 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 	if (streamDecodeType == StreamDecodeType::HLS)
 		strFormatName = "hls";
 
-	//解決路徑不對問題,改為 格式: ./hls/8/index.m3u8 相對exe文件的路徑 2024-3-18
-	//std::string hls_output_path = "./hls/"+ to_string(m_infoStream.nCameraId)+ "/index.m3u8";
-
+	//返回index.m3u8的路徑  test ok
 	std::string strOutputPath = get_filename(FType::kFileTypeHls);  
 	int nCode = avformat_alloc_output_context2(&pFormatCtx, NULL, strFormatName.c_str(), strOutputPath.c_str());
-
-  	//---------------------------------------------------------------
-	//std::string strOutputPath = "./hls/"+ to_string(m_infoStream.nCameraId)+ "/index.m3u8";
-	//int nCode = avformat_alloc_output_context2(&pFormatCtx, nullptr, "hls", strOutputPath.c_str());
-
+	 
 	if (nullptr == pFormatCtx)
 	{
 		LOG(WARNING) << "[hls] RtspStramHandle::avformat_alloc_output_context2:" << strOutputPath;
 		printf("Can't alloc hls output context %s\n", strOutputPath.c_str());
 		return false;
 	}
-
-//#ifdef _WIN32
-//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-//#elif __linux__
-//	// 编码导致的?
-//	pFormatCtx->oformat->audio_codec = AV_CODEC_ID_AAC;
-//	pFormatCtx->oformat->video_codec = AV_CODEC_ID_H264;
-//#endif
-
+	 
 	for (auto nIndex = 0; nIndex < m_pInputAVFormatCtx->nb_streams; ++nIndex)
 	{
 		AVStream* pInStream = m_pInputAVFormatCtx->streams[nIndex];
@@ -577,24 +562,26 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 			printf("%s \n", strError.c_str());
 			return false;
 		}
-		if (streamDecodeType == StreamDecodeType::HLS)
-		{
-			/*
-			 * 参数参考 https://www.cnblogs.com/michong2022/p/17016423.html
-			*/
-			av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN);      //是否直播 出错
-			av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN);   //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
-			av_opt_set(pFormatCtx->priv_data, "hls_wrap", "8", AV_OPT_SEARCH_CHILDREN);
-			av_opt_set(pFormatCtx->priv_data, "hls_time", "3", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
-			av_opt_set(pFormatCtx->priv_data, "hls_flags", "0", AV_OPT_SEARCH_CHILDREN);
-			//---------------------------------------------------------------------------------- 
-			  
-			//LOG(INFO) << "avio_open success and av_opt_set params hls_list_size = 8" << strOutputPath; 
-		}
+		
+	}
+	 
+	if (streamDecodeType == StreamDecodeType::HLS)
+	{
+		/*
+		 * 参数参考 https://www.cnblogs.com/michong2022/p/17016423.html
+		*/
+		av_opt_set(pFormatCtx->priv_data, "is_live", "true", AV_OPT_SEARCH_CHILDREN);      //是否直播 出错
+		av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", AV_OPT_SEARCH_CHILDREN);   //设置m3u8文件播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+		av_opt_set(pFormatCtx->priv_data, "hls_wrap", "8", AV_OPT_SEARCH_CHILDREN);
+		av_opt_set(pFormatCtx->priv_data, "hls_time", "3", AV_OPT_SEARCH_CHILDREN);        //默认2seconds 
+		av_opt_set(pFormatCtx->priv_data, "hls_flags", "0", AV_OPT_SEARCH_CHILDREN);
+		//---------------------------------------------------------------------------------- 
+		//TEST
+		LOG(INFO) << "StreamDecodeType::HLS and av_opt_set params hls_list_size = 8 \n" << strOutputPath; 
 	}
 	//写文件头
 	nCode = avformat_write_header(pFormatCtx, NULL);
-	m_bHlsOutInited = true;
+	  
 	if (nCode < 0)
 	{
 		std::string strError = "Can't write hls output stream header, URL:" + strOutputPath + ",errcode:" + std::to_string(nCode) + ", err msg:"
@@ -628,11 +615,6 @@ void RtspStreamHandle::write_output_hls_stream(AVFormatContext* pFormatCtx, cons
 	av_packet_rescale_hls_ts(&pktFrame, pInStream->time_base, pOutStream->time_base);
 
 	int nError = av_interleaved_write_frame(pFormatCtx, &pktFrame);
-
-	//// 清理 ts分段文件  無效 屏蔽掉
-	//AVDictionary* dict = NULL;
-	//av_dict_set(&dict, "hls_list_size", "2", 0);
-	//av_dict_set(&dict, "hls_flags", "delete_segments", 0);
 	 
 	if (nError != 0)
 	{

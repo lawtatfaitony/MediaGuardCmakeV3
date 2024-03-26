@@ -639,7 +639,7 @@ bool CameraMpeg::device_by_serial_no(Service::DeviceDetails& deviceDetails)
 
 	std::string strRst; 
 	std::stringstream ss_path_file;
-	{  ss_path_file << File::GetWorkPath() << kSeprator << "conf" << kSeprator << "main_company_detais_by_serialno.json"; }
+	{  ss_path_file << File::GetWorkPath() << kSeprator << "conf" << kSeprator << "main_company_details_by_serialno.json"; }
 	std::string mainCompanyDetailsJsonFile = ss_path_file.str();
 
 	if (DEVICE_CONFIG.cfgDevice.device_is_online_always == false)

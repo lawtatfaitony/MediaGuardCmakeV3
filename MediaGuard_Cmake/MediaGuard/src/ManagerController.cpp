@@ -137,7 +137,7 @@ void ManagerController::Init()
 		}
 
 		// for clean hls index.m3u8 cache ts files 
-		m_thread_hls_clear = std::thread(std::bind(&ManagerController::clean_hls_ts_run, this));
+		//m_thread_hls_clear = std::thread(std::bind(&ManagerController::clean_hls_ts_run, this));
 	}
 }
 
@@ -740,6 +740,7 @@ bool ManagerController::get_ts_list_file_from_index_m3u8(const std::string& path
 }
 
 
+// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
 void ManagerController::delete_ts_list_file(const std::string& hls_cmaera_id_folder, std::vector<std::string>& vector_ts_files_index_m3u8)
 {
 	if (fs::is_directory(hls_cmaera_id_folder))
@@ -768,7 +769,7 @@ void ManagerController::delete_ts_list_file(const std::string& hls_cmaera_id_fol
 	return ;
 }
 
- 
+// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
 void ManagerController::clean_each_hls_camera_folder()
 { 
 	CameraMpeg cameraMpeg; 
@@ -783,6 +784,10 @@ void ManagerController::clean_each_hls_camera_folder()
 	{ 
 		 int camera_id = itr->nCameraId;
 		 const fs::path hls_camera_folder = fs::current_path() / kHlsDir / std::to_string(camera_id);
+
+		 //TEST
+		 LOG(INFO) << "clean_each_hls_camera_folder :each camera folder = " << hls_camera_folder.string() << std::endl;
+
 		 std::vector<std::string> vector_ts_files_index_m3u8 ;
 		 bool ret = get_ts_list_file_from_index_m3u8(hls_camera_folder.string(),vector_ts_files_index_m3u8);
 		 if (ret == true)
@@ -793,7 +798,7 @@ void ManagerController::clean_each_hls_camera_folder()
 	} 
 }
 
-
+// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
 void ManagerController::clean_hls_ts_run()
 { 
 	while (!m_bExit.load())
