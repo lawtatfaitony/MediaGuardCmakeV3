@@ -40,10 +40,14 @@ int RtspStreamHandle::hw_decoder_init(AVCodecContext* ctx, const enum AVHWDevice
 {
 	int nCode = 0;
 	if ((nCode = av_hwdevice_ctx_create(&m_pHDCtx, type, NULL, NULL, 0)) < 0) {
-		fprintf(stderr, "Failed to create specified HW device.\n");
+		fprintf(stderr, "Failed to create specified HW device.maybe no hardware available \n");
+
+		LOG(INFO) << "Failed to create specified hardware device for ffmpeg decode/encode.maybe no hardware available \n" << std::endl;
+
 		return nCode;
 	}
 	ctx->hw_device_ctx = av_buffer_ref(m_pHDCtx);
+
 	return nCode;
 }
 
@@ -630,71 +634,6 @@ void RtspStreamHandle::av_packet_rescale_hls_ts(AVPacket* pkt, AVRational src_tb
 	if (pkt->duration > 0)
 		pkt->duration = av_rescale_q(pkt->duration, src_tb, dst_tb);
 }
-
-//void RtspStreamHandle::clean_hls_ts_run()
-//{
-//	if (m_infoStream.nStreamDecodeType != StreamDecodeType::HLS)
-//	{
-//		 
-//		//必须是HLS流请求才继续执行ts切片清理
-//		return;
-//	}
-//	while (!m_bExit.load())
-//	{ 
-//		clean_hls_ts(30); //保留20秒的文件记录 注意设置hls av_dist的时候不能大于这个时间，
-//		SHARED_LOCK(m_mtLock);  // std::unique_lock<std::mutex> locker(lock);
-//		m_cvCond.wait_for(locker, std::chrono::milliseconds(60000), [this]() {  //60's
-//			auto isExit = m_bExit.load();
-//			return isExit;
-//		});
-//	}
-//}
-  
-//void RtspStreamHandle::clean_hls_ts(int tsRemainSeconds)
-//{
-//	const fs::path hls_camera_path = fs::current_path() / kHlsDir / std::to_string(m_infoStream.nCameraId);
-//	const fs::path hls_path__filename_index_m3u8 = hls_camera_path / "index.m3u8";
-//	 
-//	std::vector<std::string> vecFile;
-//
-//	File::GetFilesOfDir(hls_camera_path.string(), vecFile);
-//
-//	for (size_t i = 0; i < vecFile.size(); i++) {
-//		 
-//		int iCreateTime, iModifyTime, iAccessTime, iFileLen;
-//
-//		const std::string ts_path_filename = vecFile[i].c_str();
-//
-//		if (true == File::get_file_info(ts_path_filename, iCreateTime, iModifyTime, iAccessTime, iFileLen))
-//		{
-//			//获取多少分钟前的时间
-//			std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
-//			std::chrono::system_clock::time_point before_minutes_time = curr - std::chrono::seconds(tsRemainSeconds);
-//			auto longremaintime = std::chrono::duration_cast<std::chrono::seconds>(before_minutes_time.time_since_epoch());
-//			int64_t longCreateTime = static_cast<int64_t>(iCreateTime);
-//			if (longCreateTime < longremaintime.count())
-//			{ 
-//				try {
-//
-//					File::deleteFile(ts_path_filename);
-//				}
-//				catch (const std::exception& ex) {
-//					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: " << ex.what() << "\n" << ts_path_filename << std::endl;
-//				}
-//				catch (...) {
-//					LOG(ERROR) << ts_path_filename << " [EXCEPTION] DELETED TS FILE FAIL: Unknown exception" << std::endl;
-//				}
-//
-//			}
-//			//for TEST
-//			else {
-//				LOG(INFO) << Time::GetCurrentSystemTime() << "[file not in " << tsRemainSeconds << " seconds ago]" << " file create:" << longCreateTime << "-" << iCreateTime << " | " << longremaintime.count();
-//			}
-//		}
-//	}
-//	vecFile.clear();
-//}
-
 
 void RtspStreamHandle::close_output_stream()
 {
