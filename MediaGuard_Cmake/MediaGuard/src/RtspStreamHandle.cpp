@@ -570,7 +570,6 @@ bool RtspStreamHandle::open_output_hls_stream(AVFormatContext*& pFormatCtx, int 
 #ifdef DEBUG
 		LOG(INFO) << "StreamDecodeType::HLS and av_opt_set params hls_list_size = 8 hls_time = 6's \n" << strOutputPath;
 #endif // DEBUG
-		
 	}
 	//写文件头
 	nCode = avformat_write_header(pFormatCtx, NULL);

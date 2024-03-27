@@ -53,17 +53,6 @@ public:
 	static void main_initialize(); 
 	static void http_server_start();
 	static void create_main_media_folder();
-	bool get_ts_list_file_from_index_m3u8(const std::string& path, std::vector<std::string>& vectorfiles);
 
-	// delete  ts files from hls_cmaera_id_folder exclude in index.m3u8 file
-	// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
-	void delete_ts_list_file(const std::string& path, std::vector<std::string>& vectorfiles);
-
-	// according to the [StreamPtrList] foreach to remove each camer hls folder'ts list file
-	// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
-	void clean_each_hls_camera_folder();
-
-	// timer for cleaning up the ts file of hls 定時清理hls 的 ts 文件 在 line:140 applied
-	// 未經詳細測試 停用,而且 RtspStreamHandle::open_output_hls_stream 設置hls 輸出流的選項 av_opt_set(pFormatCtx->priv_data, "hls_list_size", "8", 可以自動循環
-	void clean_hls_ts_run();
+ 
 };

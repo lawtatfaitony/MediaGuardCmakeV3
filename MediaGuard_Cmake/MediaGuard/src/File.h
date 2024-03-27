@@ -178,10 +178,7 @@ public:
 			
 #ifdef DEBUG
 			std::cout << "\nFile::deleteFile() = [true] to delete file successfully: " << filepath.string() << "\n" << std::endl;
-#endif // DEBUG
-
-			
-
+#endif // DEBUG 
 			return true;
 		}
 		else {
