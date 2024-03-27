@@ -145,16 +145,20 @@ void RtspStreamHandle::PushFrame(const cv::Mat& frame)
 			PictInfo pictInfo;
 			pictInfo.camera_id = m_infoStream.nCameraId;
 			pictInfo.path_filename = filename;
-			//TEST
-			//LOG(INFO) << "\nfunc::RtspStreamHandle::PushFrame std::string path_filename = filename; path_filename = " << filename;
+			
+#ifdef DEBUG //TEST
+			LOG(INFO) << "\nfunc::RtspStreamHandle::PushFrame std::string path_filename = filename; path_filename = " << filename;
+#endif // DEBUG 
+			
 			int64_t create_time = Time::GetMilliTimestamp();
 			int width = m_infoStream.nWidth;
 			int height = m_infoStream.nHeight;
 			//计算Mat2Base64函数耗时 
 			pictInfo.frameBase64 = Basic::CvMatToBase64::Mat2Base64(frame, ".jpg");  //avg of elapsed time = 40-70ms 
-
-			//TEST
-			//LOG(INFO) << "\nfunc::RtspStreamHandle::PushFrame path_filename = " << pictInfo.path_filename; 
+ 
+#ifdef DEBUG //TEST
+			LOG(INFO) << "\nfunc::RtspStreamHandle::PushFrame path_filename = " << pictInfo.path_filename;
+#endif // DEBUG 
 			m_listFrame.push_back(pictInfo);
 		}
 	}
