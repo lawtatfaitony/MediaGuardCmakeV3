@@ -10,7 +10,7 @@
 
 #### 組件
 
-MEDIA GUARD 項目主要 組件 : FFMPEG ;4.0  OPENCV 4.0
+MEDIA GUARD 項目主要 組件 : FFMPEG ;4.0  OPENCV 4.9
 
 安裝 函數庫 用於 ctrl+break 等事件
 
