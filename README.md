@@ -76,7 +76,7 @@ bool CameraMpeg::camera_list(Service::StreamInfoApiList& streamInfoApiList)  下
 
 CameraMpeg::detect_and_handle 未改為脫機和聯機 互相撤換模式
 
-#### 函數 bool CameraMpeg::get_task_list_by_camera_id 需要加上model對象 FOR Yolov8:
+**函數 bool CameraMpeg::get_task_list_by_camera_id 需要加上model對象 FOR Yolov8:**
 
  `"model_setting": [`
 
@@ -168,8 +168,9 @@ https://www.cnblogs.com/gongluck/archive/2019/05/07/10827950.html
 
 ----------------------------------------------------------
 
-
 ## 配置與離線運行
+
+​	什麼是離線運行場景,當需要脫離雲端運行的情況下, 可以通過設置離線模式後,系統在線的情況下,先配置好相關配置後,設備就會自動保存離線的配置文件到 ./conf 下,如圖:
 
  
 
@@ -187,4 +188,10 @@ https://www.cnblogs.com/gongluck/archive/2019/05/07/10827950.html
 
 ​	HLS直播
 
-​	
+## 任務功能操作
+
+​        **任務功能** **都是基於雲端任務的配置** (配置完成後,可以離線方式運行設備)
+
+## 	yolov8AI 功能
+
+## 	
