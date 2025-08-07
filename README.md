@@ -1,5 +1,6 @@
 ﻿# MediaGuard 功能與開發
 # MediaGuardAppV31 已經轉移到最新版
+最新版 : https://github.com/lawtatfaitony/MediaGuardAppV32  (remarks@2025-8-8)
  X:\MediaGuardAppV31
 ## CMakeProject
 
